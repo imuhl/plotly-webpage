@@ -1,0 +1,35 @@
+---
+title: "Plotly Webpage"
+author: "Ilja Muhl"
+date: "19-02-2020"
+output: 
+    html_document:
+        code_folding: hide
+        keep_md: yes
+---
+# Summary
+
+Data from Package [Ecdat](https://cran.r-project.org/web/packages/Ecdat/index.html) with cyber security breaches involving health care records of 500 or more humans reported to the U.S. Department of Health and Human Services (HHS) as of June 27, 2014.
+
+```{r, message=FALSE, warning=FALSE, fig.height=10, fig.width= 10}
+library(plotly)
+library(Ecdat)
+dfBreaches <- breaches
+dfBreaches$State <- as.character(dfBreaches$State)
+dfBreaches$Type_of_Breach <- as.character(dfBreaches$Type_of_Breach)
+dfBreaches$Date_of_Breach <- as.Date(dfBreaches$Date_of_Breach, 
+                                     format = "%m/%d/%Y")
+
+# get first type of breach
+splittedStr <- strsplit(x = dfBreaches$Type_of_Breach, split = c(",|/"))
+types <- character()
+for(l_type in splittedStr) types <- c(types,(l_type)[[1]])
+dfBreaches$types1 <- types
+
+p <- plot_ly(dfBreaches, x = ~Date_of_Breach, y = ~State, 
+        color = ~types1, size = ~log(Individuals_Affected),
+        text = ~paste("Entity:",Name_of_Covered_Entity, '$<br>Effected:', Individuals_Affected),
+        type = "scatter")
+layout(p, title = "Cyber breaches per State")
+```
+
